@@ -17,6 +17,7 @@ DRAW_LANGUAGE = {
     "tourne": 1,
     "O": 2,
     "N": 3,
+    "C": 7,
     "branche": 4,
     "finbranche": 5,
 }
