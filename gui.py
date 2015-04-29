@@ -17,8 +17,9 @@ DRAW_LANGUAGE = {
     "avance_simple": 0,
     "avance_double": 6,
     "tourne": 1,
-    "O": 2,
-    "N": 3,
+    # "nom" : 2,
+    # "O": 2,
+    # "N": 3,
     "C": 7,
     "branche": 4,
     "finbranche": 5,
@@ -144,8 +145,8 @@ class DrawZone(QGraphicsView):
         self.angle_stor.add(0)
         self.fact_stor.add(1)
         for i in bytecode:
-            if i in [DRAW_LANGUAGE["O"], DRAW_LANGUAGE["N"], DRAW_LANGUAGE["C"]]:
-                self.draw_atome(i)
+            if i is DRAW_LANGUAGE["C"]:
+                self.scene.addEllipse(self.current_pos[0], self.current_pos[1], 1, 1)
             elif i in [DRAW_LANGUAGE["avance_simple"], DRAW_LANGUAGE["avance_double"]]:
                 self.draw_line(i)
             elif i is DRAW_LANGUAGE["branche"]:
@@ -160,18 +161,14 @@ class DrawZone(QGraphicsView):
                 self.current_angle = self.angle_stor.pop()
                 self.fact = self.fact_stor.pop()
                 # self.current_angle += pi / 3 * self.fact
+            else:
+                self.draw_atome(i)
         self.setScene(self.scene)
 
     def draw_atome(self, atome):
         pos = self.current_pos
-        if atome is DRAW_LANGUAGE["C"]:
-            self.scene.addEllipse(pos[0], pos[1], 1, 1)
-        elif atome is DRAW_LANGUAGE["O"]:
-            t = self.scene.addText("O")
-            t.setPos(pos[0], pos[1])
-        elif atome is DRAW_LANGUAGE["N"]:
-            t = self.scene.addText("N")
-            t.setPos(pos[0], pos[1])
+        t = self.scene.addText(atome)
+        t.setPos(pos[0], pos[1])
 
     def draw_line(self, line):
         pos = self.pos_stor.look()
@@ -214,7 +211,6 @@ class MoleculeEdit(QTreeWidget):
             self, SIGNAL('customContextMenuRequested(QPoint)'), self.contextMenu)
 
     def buildMolecule(self):
-        self.addHydro()
         return Molecule(*self.first.getAndLinkAtome())
 
     def reset(self):
@@ -242,6 +238,7 @@ class MoleculeEdit(QTreeWidget):
                 selected.changeLiaison(action.text())
 
     def getDrawCode(self):
+        self.addHydro()
         return self.first.getDrawCode()
 
     @pyqtSlot()
@@ -387,8 +384,20 @@ class AtomeItem(QTreeWidgetItem):
             r.append(DRAW_LANGUAGE["avance_simple"])
         if self.liaison_type is self.LIAISON_TYPE["Double"]:
             r.append(DRAW_LANGUAGE["avance_double"])
-        if self.atome.nom in ["O", "N", "C"]:
+        if self.atome.nom is "C":
             r.append(DRAW_LANGUAGE[self.atome.nom])
+        elif self.atome.nom in ["O", "N"]:
+            nb_h = 0
+            for i in self.childs:
+                print(i.atome.nom)
+                if i.atome.nom is "H":
+                    nb_h += 1
+            if nb_h > 1:
+                r.append(self.atome.nom + "H" + str(nb_h))
+            if nb_h == 1:
+                r.append(self.atome.nom + "H")
+            else:
+                r.append(self.atome.nom)
         for i in self.childs:
             r += i.getDrawCode()
         if self.liaison_type is not -1:
