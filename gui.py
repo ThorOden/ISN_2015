@@ -36,25 +36,48 @@ class Drawer(QWidget):
 
         self.editor = MoleculeEdit(self)
 
-        self.btn = QPushButton("Travail !!!")
+        self.btn_export = QPushButton("Exporter")
+        self.btn_reset = QPushButton("Effacer")
+        self.btn_ready = QPushButton("Convertir")
+        self.btn_add_hydro = QPushButton("Ajouter les hydrogènes")
+        self.btn_remove_hydro = QPushButton("Enlever les hydrogènes")
+
+        self.layout_btn = QVBoxLayout(self)
+        self.layout_btn.addWidget(self.btn_add_hydro)
+        self.layout_btn.addWidget(self.btn_remove_hydro)
+        self.layout_btn.addWidget(self.btn_reset)
+        self.layout_btn.addWidget(self.btn_export)
+        self.layout_btn.addWidget(self.btn_ready)
 
         self.layout.addWidget(self.draw_zone)
         self.layout.addWidget(self.editor)
 
-        self.layout.addWidget(self.btn)
+        self.layout.addLayout(self.layout_btn)
 
         self.setLayout(self.layout)
 
-        QObject.connect(self.btn, SIGNAL('clicked()'), self.ready)
-
-    def readyEmit(self):
-        self.ready.emit()
+        QObject.connect(self.btn_ready, SIGNAL('clicked()'), self.ready)
+        QObject.connect(self.btn_reset, SIGNAL('clicked()'), self.reset)
+        QObject.connect(self.btn_export, SIGNAL('clicked()'), self.export)
+        QObject.connect(self.btn_add_hydro, SIGNAL('clicked()'), self.editor.addHydro)
+        QObject.connect(self.btn_remove_hydro, SIGNAL('clicked()'), self.editor.removeHydro)
 
     def getMolecule(self):
         print(self.editor.getDrawCode())
         self.draw_zone.reset()
         self.draw_zone.draw(self.editor.getDrawCode())
         return self.editor.buildMolecule()
+
+    @pyqtSlot()
+    def reset(self):
+        self.editor.reset()
+        self.draw_zone.reset()
+
+    @pyqtSlot()
+    def export(self):
+        fichier = QFileDialog.getSaveFileName(self, "Enregistrer la formule topologique", "", "*.png")
+        self.draw_zone.save(fichier)
+        QMessageBox.information(self, "Information", "Formule sauvegardée dans {}".format(fichier))
 
 
 class Stack:
@@ -155,6 +178,8 @@ class DrawZone(QGraphicsView):
         self.current_angle = 0
         self.current_pos = (0, 0)
         self.fact = 1
+    def save(self, fichier):
+        pass
 
 
 class MoleculeEdit(QTreeWidget):
@@ -172,7 +197,11 @@ class MoleculeEdit(QTreeWidget):
             self, SIGNAL('customContextMenuRequested(QPoint)'), self.contextMenu)
 
     def buildMolecule(self):
+        self.addHydro()
         return Molecule(*self.first.getAndLinkAtome())
+
+    def reset(self):
+        self.first.deleteAllChilds()
 
     @pyqtSlot(QPoint)
     def contextMenu(self, point):
@@ -198,6 +227,13 @@ class MoleculeEdit(QTreeWidget):
     def getDrawCode(self):
         return self.first.getDrawCode()
 
+    @pyqtSlot()
+    def addHydro(self):
+        self.first.addHydro()
+    @pyqtSlot()
+    def removeHydro(self):
+        self.first.removeHydro()
+
 
 class AtomeItem(QTreeWidgetItem):
     ATOME_TYPE = {
@@ -217,6 +253,8 @@ class AtomeItem(QTreeWidgetItem):
         self.childs = []
         self.setText(0, self.atome.nom)
         self.molecule = molecule
+
+        self.nb_hydro = 0
 
         if liaison == 0:
             self.setIcon(0, QIcon(QPixmap("simple.png")))
@@ -254,6 +292,8 @@ class AtomeItem(QTreeWidgetItem):
 
     @pyqtSlot()
     def createChild(self):
+        if self.ATOME_TYPE[self.nature.currentText()]:
+            self.nb_hydro += 1
         nouveau = AtomeItem(self.ATOME_TYPE[self.nature.currentText()], self.molecule, self.LIAISON_TYPE[
                             self.liaison.currentText()], len(self.childs), self)
         self.addChild(nouveau)
@@ -263,15 +303,23 @@ class AtomeItem(QTreeWidgetItem):
     @pyqtSlot()
     def deleteAtome(self):
         for i in self.childs:
-            i.delete()
-        if self.base is not None:
+            i.deleteAtome()
+        if not self.base is None:
             self.base.deleteChild(self.num)
             self.base.removeChild(self)
 
     def deleteChild(self, num):
+        if self.childs[num].atome.nom is "H":
+            self.nb_hydro -= 1
         self.childs.pop(num)
         for i in range(num, len(self.childs)):
             self.childs[i].num = i
+
+    @pyqtSlot()
+    def deleteAllChilds(self):
+        while len(self.childs) > 0:
+            self.childs[0].deleteAllChilds()
+            self.childs[0].deleteAtome()
 
     def createEditor(self):
         self.molecule.setItemWidget(self, 4, self.btn)
@@ -297,6 +345,8 @@ class AtomeItem(QTreeWidgetItem):
 
     def changeName(self, name):
         self.atome = self.ATOME_TYPE[name]()
+        if self.atome.nom is "H" and not self.base is None:
+            self.base.nb_hydro += 1
         self.setText(0, self.atome.nom)
 
     def changeLiaison(self, liaison):
@@ -325,6 +375,34 @@ class AtomeItem(QTreeWidgetItem):
         if self.liaison_type is not -1:
             r.append(DRAW_LANGUAGE["finbranche"])
         return r
+
+    def addHydro(self):
+        for i in self.childs:
+            i.addHydro()
+
+        borne=0
+        if self.base is None and len(self.childs) < self.atome.nb_liaison:
+            borne = self.atome.nb_liaison - len(self.childs)
+        elif self.liaison_type is self.LIAISON_TYPE["Simple"] and (len(self.childs) + 1) < self.atome.nb_liaison:
+            borne = self.atome.nb_liaison - (len(self.childs) + 1)
+        elif self.liaison_type is self.LIAISON_TYPE["Simple"] and (len(self.childs) + 2) < self.atome.nb_liaison:
+            borne = self.atome.nb_liaison - (len(self.childs) + 2)
+
+        self.nb_hydro += borne
+        for i in range(borne):
+            nouveau = AtomeItem(self.ATOME_TYPE["H"], self.molecule, self.LIAISON_TYPE[
+                    "Simple"], len(self.childs), self)
+            self.addChild(nouveau)
+            nouveau.createEditor()
+    def removeHydro(self):
+        for i in self.childs:
+            i.removeHydro()
+        i = 0
+        while self.nb_hydro > 0 and i < len(self.childs):
+            if self.childs[i].atome.nom is "H":
+                self.childs[i].deleteAtome()
+            else:
+                i += 1 
 
 
 class TextInput(QWidget):
