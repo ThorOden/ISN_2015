@@ -23,6 +23,22 @@ DRAW_LANGUAGE = {
     "branche": 4,
     "finbranche": 5,
 }
+def printPrgm(prgm):
+    for i in prgm:
+        if i is 0:
+            print("Avance Simple")
+        elif i is 6:
+            print("Avance Double")
+        elif i is 2:
+            print("O")
+        elif i is 3:
+            print("N")
+        elif i is 7:
+            print("C")
+        elif i is 4:
+            print("Branche")
+        elif i is 5:
+            print("Fin Branche")
 
 
 class Drawer(QWidget):
@@ -63,7 +79,7 @@ class Drawer(QWidget):
         QObject.connect(self.btn_remove_hydro, SIGNAL('clicked()'), self.editor.removeHydro)
 
     def getMolecule(self):
-        print(self.editor.getDrawCode())
+        printPrgm(self.editor.getDrawCode())
         self.draw_zone.reset()
         self.draw_zone.draw(self.editor.getDrawCode())
         return self.editor.buildMolecule()
@@ -110,7 +126,6 @@ class Stack:
 #     "finbranche": 5,
 # }
 
-
 class DrawZone(QGraphicsView):
 
     def __init__(self, parent=None):
@@ -121,28 +136,33 @@ class DrawZone(QGraphicsView):
         self.angle_stor = Stack()
         self.fact_stor = Stack()
         self.current_pos = (0, 0)
-        self.current_angle = 0
+        self.current_angle = pi/3
 
         self.fact = 1
 
     def draw(self, bytecode):
         self.pos_stor.add(self.current_pos)
-        self.angle_stor.add((0, 0))
+        self.angle_stor.add(0)
+        self.fact_stor.add(1)
         for i in bytecode:
             if i in [DRAW_LANGUAGE["O"], DRAW_LANGUAGE["N"], DRAW_LANGUAGE["C"]]:
                 self.draw_atome(i)
             elif i in [DRAW_LANGUAGE["avance_simple"], DRAW_LANGUAGE["avance_double"]]:
                 self.draw_line(i)
             elif i is DRAW_LANGUAGE["branche"]:
+                print(self.current_angle/pi)
+                self.current_angle = (self.current_angle + (2*pi / 3) * self.fact)
+                print(self.current_angle/pi)
+                print()
                 self.pos_stor.add(self.current_pos)
                 self.angle_stor.add(self.current_angle)
                 self.fact_stor.add(self.fact)
-                self.current_angle += pi / 3 * self.fact
                 self.fact *= -1
+                self.current_angle = self.fact * 3*pi/3 + self.current_angle
             elif i is DRAW_LANGUAGE["finbranche"]:
                 self.current_pos = self.pos_stor.pop()
                 self.current_angle = self.angle_stor.pop()
-                self.fact = - self.fact_stor.pop()
+                self.fact = self.fact_stor.pop()
                 # self.current_angle += pi / 3 * self.fact
         self.setScene(self.scene)
 
@@ -158,6 +178,7 @@ class DrawZone(QGraphicsView):
             t.setPos(pos[0], pos[1])
 
     def draw_line(self, line):
+        # print(self.current_angle)
         pos = self.pos_stor.look()
         deplacement = (
             cos(self.current_angle) * 70, sin(self.current_angle) * 70)
@@ -169,6 +190,7 @@ class DrawZone(QGraphicsView):
             self.scene.addLine(
                 pos[0], pos[1] + 10, new_pos[0], new_pos[1] + 10)
         self.current_pos = new_pos
+        self.setScene(self.scene)
 
     def reset(self):
         self.pos_stor.reset()
@@ -179,7 +201,7 @@ class DrawZone(QGraphicsView):
         self.current_pos = (0, 0)
         self.fact = 1
     def save(self, fichier):
-        pass
+        QPixmap.grabWidget(self).save(fichier)
 
 
 class MoleculeEdit(QTreeWidget):
@@ -341,6 +363,8 @@ class AtomeItem(QTreeWidgetItem):
                 a = i.getAndLinkAtome()
                 voisins = a + voisins
                 self.atome.link(voisins[0])
+                if i.liaison_type is self.LIAISON_TYPE["Double"]:
+                    self.atome.link(voisins[0])
             return [self.atome] + voisins
 
     def changeName(self, name):
@@ -381,12 +405,18 @@ class AtomeItem(QTreeWidgetItem):
             i.addHydro()
 
         borne=0
-        if self.base is None and len(self.childs) < self.atome.nb_liaison:
-            borne = self.atome.nb_liaison - len(self.childs)
-        elif self.liaison_type is self.LIAISON_TYPE["Simple"] and (len(self.childs) + 1) < self.atome.nb_liaison:
-            borne = self.atome.nb_liaison - (len(self.childs) + 1)
-        elif self.liaison_type is self.LIAISON_TYPE["Simple"] and (len(self.childs) + 2) < self.atome.nb_liaison:
-            borne = self.atome.nb_liaison - (len(self.childs) + 2)
+        nb_childs = 0
+        for i in self.childs:
+            if i.liaison_type is self.LIAISON_TYPE["Double"]:
+                nb_childs += 2
+            else:
+                nb_childs += 1
+        if self.base is None and nb_childs < self.atome.nb_liaison:
+            borne = self.atome.nb_liaison - nb_childs
+        elif self.liaison_type is self.LIAISON_TYPE["Simple"] and (nb_childs + 1) < self.atome.nb_liaison:
+            borne = self.atome.nb_liaison - (nb_childs + 1)
+        elif self.liaison_type is self.LIAISON_TYPE["Simple"] and (nb_childs + 2) < self.atome.nb_liaison:
+            borne = self.atome.nb_liaison - (nb_childs + 2)
 
         self.nb_hydro += borne
         for i in range(borne):
