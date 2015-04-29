@@ -8,6 +8,8 @@ from versBrute import *
 
 from molecule import *
 
+from math import *
+
 DOUBLE = 1
 SIMPLE = 0
 
@@ -50,6 +52,8 @@ class Drawer(QWidget):
 
     def getMolecule(self):
         print(self.editor.getDrawCode())
+        self.draw_zone.reset()
+        self.draw_zone.draw(self.editor.getDrawCode())
         return self.editor.buildMolecule()
 
 
@@ -61,12 +65,27 @@ class Stack:
     def add(self, pos):
         self.data.append(pos)
 
+    def look(self):
+        return self.data[-1]
+
     def pop(self):
         r = self.data[-1]
         self.data = self.data[:-1]
+        return r
 
     def reset(self):
         self.data = []
+
+# DRAW_LANGUAGE = {
+#     "avance_simple": 0,
+#     "avance_double": 6,
+#     "tourne": 1,
+#     "O": 2,
+#     "N": 3,
+#     "C": 7,
+#     "branche": 4,
+#     "finbranche": 5,
+# }
 
 
 class DrawZone(QGraphicsView):
@@ -75,13 +94,67 @@ class DrawZone(QGraphicsView):
         super().__init__(parent)
         self.scene = QGraphicsScene(self)
         self.setScene(self.scene)
-        self.stack = Stack()
+        self.pos_stor = Stack()
+        self.angle_stor = Stack()
+        self.fact_stor = Stack()
+        self.current_pos = (0, 0)
+        self.current_angle = 0
+
+        self.fact = 1
 
     def draw(self, bytecode):
-        self.stack.add((0,0))
-        angle = 0
+        self.pos_stor.add(self.current_pos)
+        self.angle_stor.add((0, 0))
         for i in bytecode:
-            pass
+            if i in [DRAW_LANGUAGE["O"], DRAW_LANGUAGE["N"], DRAW_LANGUAGE["C"]]:
+                self.draw_atome(i)
+            elif i in [DRAW_LANGUAGE["avance_simple"], DRAW_LANGUAGE["avance_double"]]:
+                self.draw_line(i)
+            elif i is DRAW_LANGUAGE["branche"]:
+                self.pos_stor.add(self.current_pos)
+                self.angle_stor.add(self.current_angle)
+                self.fact_stor.add(self.fact)
+                self.current_angle += pi / 3 * self.fact
+                self.fact *= -1
+            elif i is DRAW_LANGUAGE["finbranche"]:
+                self.current_pos = self.pos_stor.pop()
+                self.current_angle = self.angle_stor.pop()
+                self.fact = - self.fact_stor.pop()
+                # self.current_angle += pi / 3 * self.fact
+        self.setScene(self.scene)
+
+    def draw_atome(self, atome):
+        pos = self.current_pos
+        if atome is DRAW_LANGUAGE["C"]:
+            self.scene.addEllipse(pos[0], pos[1], 1, 1)
+        elif atome is DRAW_LANGUAGE["O"]:
+            t = self.scene.addText("O")
+            t.setPos(pos[0], pos[1])
+        elif atome is DRAW_LANGUAGE["N"]:
+            t = self.scene.addText("N")
+            t.setPos(pos[0], pos[1])
+
+    def draw_line(self, line):
+        pos = self.pos_stor.look()
+        deplacement = (
+            cos(self.current_angle) * 70, sin(self.current_angle) * 70)
+        new_pos = (pos[0] + deplacement[0], pos[1] + deplacement[1])
+
+        self.scene.addLine(pos[0], pos[1], new_pos[0], new_pos[1])
+
+        if line is DRAW_LANGUAGE["avance_double"]:
+            self.scene.addLine(
+                pos[0], pos[1] + 10, new_pos[0], new_pos[1] + 10)
+        self.current_pos = new_pos
+
+    def reset(self):
+        self.pos_stor.reset()
+        self.angle_stor.reset()
+        self.scene.clear()
+        self.setScene(self.scene)
+        self.current_angle = 0
+        self.current_pos = (0, 0)
+        self.fact = 1
 
 
 class MoleculeEdit(QTreeWidget):
@@ -124,6 +197,7 @@ class MoleculeEdit(QTreeWidget):
 
     def getDrawCode(self):
         return self.first.getDrawCode()
+
 
 class AtomeItem(QTreeWidgetItem):
     ATOME_TYPE = {
