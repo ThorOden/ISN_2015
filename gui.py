@@ -79,7 +79,6 @@ class Drawer(QWidget):
         QObject.connect(self.btn_remove_hydro, SIGNAL('clicked()'), self.editor.removeHydro)
 
     def getMolecule(self):
-        printPrgm(self.editor.getDrawCode())
         self.draw_zone.reset()
         self.draw_zone.draw(self.editor.getDrawCode())
         return self.editor.buildMolecule()
@@ -150,10 +149,7 @@ class DrawZone(QGraphicsView):
             elif i in [DRAW_LANGUAGE["avance_simple"], DRAW_LANGUAGE["avance_double"]]:
                 self.draw_line(i)
             elif i is DRAW_LANGUAGE["branche"]:
-                print(self.current_angle/pi)
                 self.current_angle = (self.current_angle + (2*pi / 3) * self.fact)
-                print(self.current_angle/pi)
-                print()
                 self.pos_stor.add(self.current_pos)
                 self.angle_stor.add(self.current_angle)
                 self.fact_stor.add(self.fact)
@@ -178,7 +174,6 @@ class DrawZone(QGraphicsView):
             t.setPos(pos[0], pos[1])
 
     def draw_line(self, line):
-        # print(self.current_angle)
         pos = self.pos_stor.look()
         deplacement = (
             cos(self.current_angle) * 70, sin(self.current_angle) * 70)
