@@ -167,8 +167,12 @@ class DrawZone(QGraphicsView):
         self.scene.addLine(pos[0], pos[1], new_pos[0], new_pos[1])
 
         if line is DRAW_LANGUAGE["avance_double"]:
+            rect = (sqrt(25 - 25/(1+(deplacement[1]/deplacement[0])**2)), sqrt(25/(1+(deplacement[1]/deplacement[0])**2)))
+            print(deplacement)
+            print(rect)
+            print()
             self.scene.addLine(
-                pos[0], pos[1] + 10, new_pos[0], new_pos[1] + 10)
+                pos[0]+ rect[0], pos[1] + rect[1], new_pos[0] + rect[0], new_pos[1] + rect[1])
         self.current_pos = new_pos
         self.setScene(self.scene)
 
