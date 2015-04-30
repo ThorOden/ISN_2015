@@ -21,6 +21,8 @@ DRAW_LANGUAGE = {
     "branche": 4,
     "finbranche": 5,
 }
+
+
 def printPrgm(prgm):
     for i in prgm:
         if i is 0:
@@ -73,8 +75,10 @@ class Drawer(QWidget):
         QObject.connect(self.btn_ready, SIGNAL('clicked()'), self.ready)
         QObject.connect(self.btn_reset, SIGNAL('clicked()'), self.reset)
         QObject.connect(self.btn_export, SIGNAL('clicked()'), self.export)
-        QObject.connect(self.btn_add_hydro, SIGNAL('clicked()'), self.editor.addHydro)
-        QObject.connect(self.btn_remove_hydro, SIGNAL('clicked()'), self.editor.removeHydro)
+        QObject.connect(
+            self.btn_add_hydro, SIGNAL('clicked()'), self.editor.addHydro)
+        QObject.connect(
+            self.btn_remove_hydro, SIGNAL('clicked()'), self.editor.removeHydro)
 
     def getMolecule(self):
         self.draw_zone.reset()
@@ -88,11 +92,12 @@ class Drawer(QWidget):
 
     @pyqtSlot()
     def export(self):
-        fichier = QFileDialog.getSaveFileName(self, "Enregistrer la formule topologique", "", "*.png")
+        fichier = QFileDialog.getSaveFileName(
+            self, "Enregistrer la formule topologique", "", "*.png")
         if fichier is not "":
             self.draw_zone.save(fichier)
-            QMessageBox.information(self, "Information", "Formule sauvegardée dans {}".format(fichier))
-
+            QMessageBox.information(
+                self, "Information", "Formule sauvegardée dans {}".format(fichier))
 
 
 class Stack:
@@ -114,6 +119,7 @@ class Stack:
     def reset(self):
         self.data = []
 
+
 class DrawZone(QGraphicsView):
 
     def __init__(self, parent=None):
@@ -124,7 +130,7 @@ class DrawZone(QGraphicsView):
         self.angle_stor = Stack()
         self.fact_stor = Stack()
         self.current_pos = (0, 0)
-        self.current_angle = pi/3
+        self.current_angle = pi / 3
 
         self.fact = 1
 
@@ -134,16 +140,19 @@ class DrawZone(QGraphicsView):
         self.fact_stor.add(1)
         for i in bytecode:
             if i is DRAW_LANGUAGE["C"]:
-                self.scene.addEllipse(self.current_pos[0], self.current_pos[1], 1, 1)
+                self.scene.addEllipse(
+                    self.current_pos[0], self.current_pos[1], 1, 1)
             elif i in [DRAW_LANGUAGE["avance_simple"], DRAW_LANGUAGE["avance_double"]]:
                 self.draw_line(i)
             elif i is DRAW_LANGUAGE["branche"]:
-                self.current_angle = (self.current_angle + (2*pi / 3) * self.fact)
+                self.current_angle = (
+                    self.current_angle + (2 * pi / 3) * self.fact)
                 self.pos_stor.add(self.current_pos)
                 self.angle_stor.add(self.current_angle)
                 self.fact_stor.add(self.fact)
                 self.fact *= -1
-                self.current_angle = self.fact * 3*pi/3 + self.current_angle
+                self.current_angle = self.fact * \
+                    3 * pi / 3 + self.current_angle
             elif i is DRAW_LANGUAGE["finbranche"]:
                 self.current_pos = self.pos_stor.pop()
                 self.current_angle = self.angle_stor.pop()
@@ -167,12 +176,10 @@ class DrawZone(QGraphicsView):
         self.scene.addLine(pos[0], pos[1], new_pos[0], new_pos[1])
 
         if line is DRAW_LANGUAGE["avance_double"]:
-            rect = (sqrt(25 - 25/(1+(deplacement[1]/deplacement[0])**2)), sqrt(25/(1+(deplacement[1]/deplacement[0])**2)))
-            print(deplacement)
-            print(rect)
-            print()
+            rect = (sqrt(25 - 25 / (1 + (deplacement[1] / deplacement[0]) ** 2)), sqrt(
+                25 / (1 + (deplacement[1] / deplacement[0]) ** 2)))
             self.scene.addLine(
-                pos[0]+ rect[0], pos[1] + rect[1], new_pos[0] + rect[0], new_pos[1] + rect[1])
+                pos[0] + rect[0], pos[1] + rect[1], new_pos[0] + rect[0], new_pos[1] + rect[1])
         self.current_pos = new_pos
         self.setScene(self.scene)
 
@@ -184,6 +191,7 @@ class DrawZone(QGraphicsView):
         self.current_angle = 0
         self.current_pos = (0, 0)
         self.fact = 1
+
     def save(self, fichier):
         QPixmap.grabWidget(self).save(fichier)
 
@@ -236,6 +244,7 @@ class MoleculeEdit(QTreeWidget):
     @pyqtSlot()
     def addHydro(self):
         self.first.addHydro()
+
     @pyqtSlot()
     def removeHydro(self):
         self.first.removeHydro()
@@ -399,7 +408,7 @@ class AtomeItem(QTreeWidgetItem):
         for i in self.childs:
             i.addHydro()
 
-        borne=0
+        borne = 0
         nb_childs = 0
         for i in self.childs:
             if i.liaison_type is self.LIAISON_TYPE["Double"]:
@@ -416,9 +425,10 @@ class AtomeItem(QTreeWidgetItem):
         self.nb_hydro += borne
         for i in range(borne):
             nouveau = AtomeItem(self.ATOME_TYPE["H"], self.molecule, self.LIAISON_TYPE[
-                    "Simple"], len(self.childs), self)
+                "Simple"], len(self.childs), self)
             self.addChild(nouveau)
             nouveau.createEditor()
+
     def removeHydro(self):
         for i in self.childs:
             i.removeHydro()
@@ -427,7 +437,7 @@ class AtomeItem(QTreeWidgetItem):
             if self.childs[i].atome.nom is "H":
                 self.childs[i].deleteAtome()
             else:
-                i += 1 
+                i += 1
 
 
 class TextInput(QWidget):
