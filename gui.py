@@ -17,9 +17,6 @@ DRAW_LANGUAGE = {
     "avance_simple": 0,
     "avance_double": 6,
     "tourne": 1,
-    # "nom" : 2,
-    # "O": 2,
-    # "N": 3,
     "C": 7,
     "branche": 4,
     "finbranche": 5,
@@ -92,8 +89,10 @@ class Drawer(QWidget):
     @pyqtSlot()
     def export(self):
         fichier = QFileDialog.getSaveFileName(self, "Enregistrer la formule topologique", "", "*.png")
-        self.draw_zone.save(fichier)
-        QMessageBox.information(self, "Information", "Formule sauvegardée dans {}".format(fichier))
+        if fichier is not "":
+            self.draw_zone.save(fichier)
+            QMessageBox.information(self, "Information", "Formule sauvegardée dans {}".format(fichier))
+
 
 
 class Stack:
@@ -114,17 +113,6 @@ class Stack:
 
     def reset(self):
         self.data = []
-
-# DRAW_LANGUAGE = {
-#     "avance_simple": 0,
-#     "avance_double": 6,
-#     "tourne": 1,
-#     "O": 2,
-#     "N": 3,
-#     "C": 7,
-#     "branche": 4,
-#     "finbranche": 5,
-# }
 
 class DrawZone(QGraphicsView):
 
@@ -389,7 +377,6 @@ class AtomeItem(QTreeWidgetItem):
         elif self.atome.nom in ["O", "N"]:
             nb_h = 0
             for i in self.childs:
-                print(i.atome.nom)
                 if i.atome.nom is "H":
                     nb_h += 1
             if nb_h > 1:
