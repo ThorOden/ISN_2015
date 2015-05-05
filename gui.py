@@ -166,6 +166,8 @@ class DrawZone(QGraphicsView):
         pos = self.current_pos
         t = self.scene.addText(atome)
         t.setPos(pos[0], pos[1])
+        t.setHtml("<div style='z-index:1000;background-color:#FFFFFF;'>" + atome + "</div>")
+        t.setFlags(QGraphicsItem.ItemIsFocusable | QGraphicsItem.ItemIsMovable | QGraphicsItem.ItemIsSelectable | t.flags())
 
     def draw_line(self, line):
         pos = self.pos_stor.look()
