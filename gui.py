@@ -14,31 +14,31 @@ DOUBLE = 1
 SIMPLE = 0
 
 DRAW_LANGUAGE = {
-    "avance_simple": 0,
-    "avance_double": 6,
-    "tourne": 1,
-    "C": 7,
-    "branche": 4,
-    "finbranche": 5,
+    "avance_simple": 1,
+    "avance_double": 2,
+    "branche4": 3,
+    "C": 4,
+    "branche": 5,
+    "finbranche": 6,
 }
 
 
 def printPrgm(prgm):
     for i in prgm:
-        if i is 0:
+        if i is 1:
             print("Avance Simple")
-        elif i is 6:
-            print("Avance Double")
         elif i is 2:
-            print("O")
+            print("Avance Double")
         elif i is 3:
-            print("N")
-        elif i is 7:
-            print("C")
+            print("branche4")
         elif i is 4:
-            print("Branche")
+            print("C")
         elif i is 5:
-            print("Fin Branche")
+            print("branche")
+        elif i is 6:
+            print("fin branche")
+        else:
+            print(i)
 
 
 class Drawer(QWidget):
@@ -129,12 +129,15 @@ class DrawZone(QGraphicsView):
         self.pos_stor = Stack()
         self.angle_stor = Stack()
         self.fact_stor = Stack()
+        self.current_angle_step_stor = Stack()
         self.current_pos = (0, 0)
         self.current_angle = pi / 3
+        self.current_angle_step = 2*pi/3
 
         self.fact = 1
 
     def draw(self, bytecode):
+        printPrgm(bytecode)
         self.pos_stor.add(self.current_pos)
         self.angle_stor.add(0)
         self.fact_stor.add(1)
@@ -146,17 +149,31 @@ class DrawZone(QGraphicsView):
                 self.draw_line(i)
             elif i is DRAW_LANGUAGE["branche"]:
                 self.current_angle = (
-                    self.current_angle + (2 * pi / 3) * self.fact)
+                    self.current_angle + self.current_angle_step * self.fact)
+                self.current_angle_step_stor.add(self.current_angle_step)
                 self.pos_stor.add(self.current_pos)
                 self.angle_stor.add(self.current_angle)
                 self.fact_stor.add(self.fact)
+                self.current_angle_step = 2*pi/3
                 self.fact *= -1
                 self.current_angle = self.fact * \
                     3 * pi / 3 + self.current_angle
+            elif i is DRAW_LANGUAGE["branche4"]:
+                self.current_angle = (
+                    self.current_angle + self.current_angle_step * self.fact)
+                self.current_angle_step_stor.add(self.current_angle_step)
+                self.pos_stor.add(self.current_pos)
+                self.angle_stor.add(self.current_angle)
+                self.fact_stor.add(self.fact)
+                # self.fact *= -1
+                self.current_angle_step = pi/2
+                self.current_angle = self.fact * \
+                    pi + self.current_angle
             elif i is DRAW_LANGUAGE["finbranche"]:
                 self.current_pos = self.pos_stor.pop()
                 self.current_angle = self.angle_stor.pop()
                 self.fact = self.fact_stor.pop()
+                self.current_angle_step = self.current_angle_step_stor.pop()
                 # self.current_angle += pi / 3 * self.fact
             else:
                 self.draw_atome(i)
@@ -309,9 +326,10 @@ class AtomeItem(QTreeWidgetItem):
 
     @pyqtSlot()
     def createChild(self):
-        if self.ATOME_TYPE[self.nature.currentText()]:
+        nature = self.nature.currentText()
+        if nature is "H":
             self.nb_hydro += 1
-        nouveau = AtomeItem(self.ATOME_TYPE[self.nature.currentText()], self.molecule, self.LIAISON_TYPE[
+        nouveau = AtomeItem(self.ATOME_TYPE[nature], self.molecule, self.LIAISON_TYPE[
                             self.liaison.currentText()], len(self.childs), self)
         self.addChild(nouveau)
         nouveau.createEditor()
@@ -381,8 +399,15 @@ class AtomeItem(QTreeWidgetItem):
         r = []
         if self.atome.nom is "H":
             return r
-        if self.liaison_type is not -1:
+        print(self.atome.nom, len(self.childs), self.nb_hydro, sep=" ")
+
+        liaison4 = 3
+        if self.liaison_type is -1:
+            liaison4 = 4
+        if (len(self.childs) - self.nb_hydro) < liaison4:
             r.append(DRAW_LANGUAGE["branche"])
+        elif (len(self.childs) - self.nb_hydro) >= liaison4:
+            r.append(DRAW_LANGUAGE["branche4"])
         if self.liaison_type is self.LIAISON_TYPE["Simple"]:
             r.append(DRAW_LANGUAGE["avance_simple"])
         if self.liaison_type is self.LIAISON_TYPE["Double"]:
