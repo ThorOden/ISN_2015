@@ -237,6 +237,7 @@ class MoleculeEdit(QTreeWidget):
         super().__init__(parent)
         self.first = AtomeItem(CARBONE, self)
         self.first.createEditor()
+        self.setMinimumWidth(500)
 
         self.setHeaderLabels(
             ["Atome", "", "Liaison à créer", "Atome à créer", ""])
@@ -540,7 +541,7 @@ class Fenetre(QDialog):
         self.setLayout(self.layout)
 
         self.setWindowTitle("Nomenclature")
-        self.setMinimumWidth(800)
+        self.setMinimumWidth(900)
         self.setMinimumHeight(600)
 
         QObject.connect(self.draw, SIGNAL('ready()'), self.fromGraph)
