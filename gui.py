@@ -132,7 +132,7 @@ class DrawZone(QGraphicsView):
         self.current_angle_step_stor = Stack()
         self.current_pos = (0, 0)
         self.current_angle = pi / 3
-        self.current_angle_step = 2*pi/3
+        self.current_angle_step = 2 * pi / 3
 
         self.fact = 1
 
@@ -154,7 +154,7 @@ class DrawZone(QGraphicsView):
                 self.pos_stor.add(self.current_pos)
                 self.angle_stor.add(self.current_angle)
                 self.fact_stor.add(self.fact)
-                self.current_angle_step = 2*pi/3
+                self.current_angle_step = 2 * pi / 3
                 self.fact *= -1
                 self.current_angle = self.fact * \
                     3 * pi / 3 + self.current_angle
@@ -165,7 +165,7 @@ class DrawZone(QGraphicsView):
                 self.pos_stor.add(self.current_pos)
                 self.angle_stor.add(self.current_angle)
                 self.fact_stor.add(self.fact)
-                self.current_angle_step = pi/2
+                self.current_angle_step = pi / 2
                 self.current_angle = self.fact * \
                     pi + self.current_angle
             elif i is DRAW_LANGUAGE["finbranche"]:
@@ -181,8 +181,10 @@ class DrawZone(QGraphicsView):
         pos = self.current_pos
         t = self.scene.addText(atome)
         t.setPos(pos[0], pos[1])
-        t.setHtml("<div style='z-index:1000;background-color:#FFFFFF;'>" + atome + "</div>")
-        t.setFlags(QGraphicsItem.ItemIsFocusable | QGraphicsItem.ItemIsMovable | QGraphicsItem.ItemIsSelectable | t.flags())
+        t.setHtml(
+            "<div style='z-index:1000;background-color:#FFFFFF;'>" + atome + "</div>")
+        t.setFlags(QGraphicsItem.ItemIsFocusable | QGraphicsItem.ItemIsMovable |
+                   QGraphicsItem.ItemIsSelectable | t.flags())
 
     def draw_line(self, line):
         pos = self.pos_stor.look()
