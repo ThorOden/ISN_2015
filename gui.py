@@ -137,7 +137,7 @@ class DrawZone(QGraphicsView):
         self.fact = 1
 
     def draw(self, bytecode):
-        printPrgm(bytecode)
+        # printPrgm(bytecode)
         self.pos_stor.add(self.current_pos)
         self.angle_stor.add(0)
         self.fact_stor.add(1)
@@ -165,7 +165,6 @@ class DrawZone(QGraphicsView):
                 self.pos_stor.add(self.current_pos)
                 self.angle_stor.add(self.current_angle)
                 self.fact_stor.add(self.fact)
-                # self.fact *= -1
                 self.current_angle_step = pi/2
                 self.current_angle = self.fact * \
                     pi + self.current_angle
@@ -174,7 +173,6 @@ class DrawZone(QGraphicsView):
                 self.current_angle = self.angle_stor.pop()
                 self.fact = self.fact_stor.pop()
                 self.current_angle_step = self.current_angle_step_stor.pop()
-                # self.current_angle += pi / 3 * self.fact
             else:
                 self.draw_atome(i)
         self.setScene(self.scene)
@@ -399,7 +397,6 @@ class AtomeItem(QTreeWidgetItem):
         r = []
         if self.atome.nom is "H":
             return r
-        print(self.atome.nom, len(self.childs), self.nb_hydro, sep=" ")
 
         liaison4 = 3
         if self.liaison_type is -1:
@@ -421,7 +418,7 @@ class AtomeItem(QTreeWidgetItem):
                     nb_h += 1
             if nb_h > 1:
                 r.append(self.atome.nom + "H" + str(nb_h))
-            if nb_h == 1:
+            elif nb_h == 1:
                 r.append(self.atome.nom + "H")
             else:
                 r.append(self.atome.nom)
