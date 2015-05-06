@@ -507,6 +507,7 @@ class Fenetre(QDialog):
     def __init__(self, parent=None):
         super().__init__(parent)
         self.layout = QVBoxLayout(self)
+        self.help_btn = QPushButton("Aide")
         self.layout_text = QFormLayout(self)
 
         self.input_brute = TextInput(self)
@@ -514,6 +515,7 @@ class Fenetre(QDialog):
 
         self.draw = Drawer(self)
 
+        self.layout.addWidget(self.help_btn)
         self.layout.addWidget(self.draw)
 
         self.layout_text.addRow('Formule brute :', self.input_brute)
