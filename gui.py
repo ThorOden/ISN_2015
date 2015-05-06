@@ -501,6 +501,19 @@ class TextInput(QWidget):
     def setText(self, s):
         self.input.setText(s)
 
+class Help(QDialog):
+    def __init__(self, parent=None):
+        super().__init__(parent)
+        self.layout = QVBoxLayout(self)
+        self.txt = QTextEdit()
+        with open("help_text.txt", "r") as txt:
+            self.txt.setText(txt.read())
+        self.txt.setReadOnly(True)
+        self.layout.addWidget(self.txt)
+        self.setLayout(self.layout)
+        self.setWindowTitle("Aide")
+        self.setMinimumWidth(800)
+        self.setMinimumHeight(600)
 
 class Fenetre(QDialog):
 
@@ -508,6 +521,7 @@ class Fenetre(QDialog):
         super().__init__(parent)
         self.layout = QVBoxLayout(self)
         self.help_btn = QPushButton("Aide")
+        self.help_window = Help(self)
         self.layout_text = QFormLayout(self)
 
         self.input_brute = TextInput(self)
@@ -525,7 +539,12 @@ class Fenetre(QDialog):
         self.layout.addLayout(self.layout_text)
         self.setLayout(self.layout)
 
+        self.setWindowTitle("Nomenclature")
+        self.setMinimumWidth(800)
+        self.setMinimumHeight(600)
+
         QObject.connect(self.draw, SIGNAL('ready()'), self.fromGraph)
+        QObject.connect(self.help_btn, SIGNAL('clicked()'), self.help_window.show)
 
     @pyqtSlot()
     def fromGraph(self):

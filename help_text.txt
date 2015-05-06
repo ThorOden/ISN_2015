@@ -1,0 +1,72 @@
+<h1 id="nomenclature">Nomenclature</h1>
+
+<p>Nomenclature est un programme ayant pour but d’effectuer la conversion entre les formules brutes - topologiques et nomenclaturée d’une molécule de chimie organique. </p>
+
+<p><div class="toc">
+<ul>
+<li><a href="#nomenclature">Nomenclature</a><ul>
+<li><a href="#license">License</a></li>
+<li><a href="#utilisation">Utilisation</a><ul>
+<li><a href="#formule-topologique">Formule topologique</a></li>
+<li><a href="#formule-brute">Formule brute</a></li>
+<li><a href="#formule-nomenclaturée">Formule nomenclaturée</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</div>
+</p>
+
+
+
+<h2 id="license">License</h2>
+
+<p>Copyright (C) 2015 BOUVIN Valentin, HONNORATY Vincent, LEVY-FALK Hugo</p>
+
+<p>This program is free software: you can redistribute it and/or modify <br>
+it under the terms of the GNU General Public License as published by <br>
+the Free Software Foundation, either version 3 of the License, or <br>
+(at your option) any later version.</p>
+
+<p>This program is distributed in the hope that it will be useful, <br>
+but WITHOUT ANY WARRANTY; without even the implied warranty of <br>
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the <br>
+GNU General Public License for more details.</p>
+
+<p>You should have received a copy of the GNU General Public License <br>
+along with this program.  If not, see <a href="http://www.gnu.org/licenses/">http://www.gnu.org/licenses/</a>.</p>
+
+
+
+<h2 id="utilisation">Utilisation</h2>
+
+
+
+<h3 id="formule-topologique">Formule topologique</h3>
+
+<p>La saisie de la formule topologique s’effectue au moyen d’un affichage en arbre. Un alinéa symbolise une “filiation”, c’est à dire une liaison.</p>
+
+<p>Chaque atome possède une barre d’outils de la sorte :</p>
+
+<p>[Suppression de l’atome] [Type de liaison à créer] [Nature de l’atome à créer] [Lancement de la création de l’atome enfant]</p>
+
+<p>Il n’est pas utile d’ajouter manuellement les hydrogènes car le programme comblera automatiquement les “trous” par des hydrogène.</p>
+
+<p>Il y a à disposition une barre d’outils sur la droite permettant d’ajouter automatiquement des hydrogènes, d’enlever automatiquement les hydrogènes, d’effacer la molécule courrante, d’exporter la formule topologique courrante (nécessite d’avoir lancé la convertion au préalable) et de convertir l’arbre vers la formule topologique, brute et nomenclaturée.</p>
+
+<p><strong>Note à propos de la suppression d’un atome dans une molécule :</strong> la suppression d’un atome entraîne la suppression de la totalité de ses enfants, sans retour en arrière possible.</p>
+
+<p>Il est possible de modifier un atome créé précédemment au moyen d’un clique droit sur ce dernier.</p>
+
+
+
+<h3 id="formule-brute">Formule brute</h3>
+
+<p><em>À venir</em></p>
+
+
+
+<h3 id="formule-nomenclaturée">Formule nomenclaturée</h3>
+
+<p><em>À venir</em></p>
