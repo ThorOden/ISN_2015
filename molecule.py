@@ -26,6 +26,7 @@ class Atome:
         self.nb_liaison = nb_liaison
         self.nb_current_liaison = 0
         self.display_name_gui = display_name_gui
+        self.gui_visited = False
 
     def link(self, atome, n=1, relink=True):
         if self.nb_current_liaison + n > self.nb_liaison:
@@ -50,6 +51,7 @@ class Atome:
             return ''
 
     def delink(self):
+        self.gui_visited = False
         self.nb_current_liaison = 0
         self.liaisons = []
 
