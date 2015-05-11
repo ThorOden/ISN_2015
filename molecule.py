@@ -65,10 +65,10 @@ class Molecule(list):
 
     def __init__(self, *atome):
         list.__init__(self)
-        self.add_atome(atome)
+        self.add_atome(*atome)
 
     def add_atome(self, *atome):
-        for i in atome[0]:
+        for i in atome:
             self.append(i)
 
     def get_cleaned_link(self, ignore=''):
