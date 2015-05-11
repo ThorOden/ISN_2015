@@ -158,7 +158,6 @@ class DrawZone(QGraphicsView):
         self.fact = 1
 
     def draw(self, bytecode):
-        printPrgm(bytecode)
         self.pos_stor.add(self.current_pos)
         self.angle_stor.add(0)
         self.fact_stor.add(1)
@@ -559,8 +558,8 @@ class Help(QDialog):
         super().__init__(parent)
         self.layout = QVBoxLayout(self)
         self.txt = QTextEdit()
-        #with open("help_text.txt", "r") as txt:
-        #    self.txt.setText(txt.read())
+        with open("help_text.txt", "r", encoding='utf-8') as txt:
+            self.txt.setText(txt.read())
         self.txt.setReadOnly(True)
         self.layout.addWidget(self.txt)
         self.setLayout(self.layout)
@@ -605,7 +604,7 @@ class Fenetre(QDialog):
         QObject.connect(self.help_btn, SIGNAL('clicked()'), self.help_window.show)
         QObject.connect(self.input_nomenc, SIGNAL('ready()'), self.fromName)
         QObject.connect(self.input_brute, SIGNAL('ready()'), self.setChoices)
-        QObject.connect(self.molecule_choice, SIGNAL('currentItemChanged(QListWidgetItem * current, QListWidgetItem * previous)'), self.changeMolecule)
+        #QObject.connect(self.molecule_choice, SIGNAL('currentItemChanged(QListWidgetItem * current, QListWidgetItem * previous)'), self.changeMolecule)
 
     @pyqtSlot()
     def fromGraph(self):
