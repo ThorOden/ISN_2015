@@ -1,4 +1,4 @@
-#! /usr/bin/python3
+﻿#! /usr/bin/python3
 
 # Nomenclature
 # Copyright (C) 2015 BOUVIN Valentin, HONNORATY Vincent, LEVY-FALK Hugo
@@ -21,6 +21,8 @@ from PyQt4.QtCore import *
 import sys
 
 from versBrute import *
+
+from nomenclature import nomenclature
 
 from molecule import *
 
@@ -114,11 +116,7 @@ class Drawer(QWidget):
             self.draw_zone.save(fichier)
             QMessageBox.information(
                 self, "Information", "Formule sauvegardée dans {}".format(fichier))
-    @pyqtSlot()
-    def fromMolecule(self, molecule):
-        self.editor.fromMolecule(molecule)
-        self.draw_zone.reset()
-        self.draw_zone.draw(self.editor.getDrawCode())
+
 
 class Stack:
 
@@ -157,12 +155,11 @@ class DrawZone(QGraphicsView):
         self.fact = 1
 
     def draw(self, bytecode):
-        print("Drawing ...")
+        # printPrgm(bytecode)
         self.pos_stor.add(self.current_pos)
         self.angle_stor.add(0)
         self.fact_stor.add(1)
-        for x, i in enumerate(bytecode):
-            print(int((x+1)/len(bytecode)*100), " % ", end="\r")
+        for i in bytecode:
             if i is DRAW_LANGUAGE["C"]:
                 self.scene.addEllipse(
                     self.current_pos[0], self.current_pos[1], 1, 1)
@@ -196,7 +193,6 @@ class DrawZone(QGraphicsView):
                 self.current_angle_step = self.current_angle_step_stor.pop()
             else:
                 self.draw_atome(i)
-        print()
         self.setScene(self.scene)
 
     def draw_atome(self, atome):
@@ -253,7 +249,6 @@ class MoleculeEdit(QTreeWidget):
             self, SIGNAL('customContextMenuRequested(QPoint)'), self.contextMenu)
 
     def buildMolecule(self):
-        print("Building molecule...")
         return Molecule(*self.first.getAndLinkAtome())
 
     def reset(self):
@@ -281,26 +276,16 @@ class MoleculeEdit(QTreeWidget):
                 selected.changeLiaison(action.text())
 
     def getDrawCode(self):
-        print("Getting draw code ...")
         self.addHydro()
-        c = self.first.getDrawCode()
-        return c
+        return self.first.getDrawCode()
 
     @pyqtSlot()
     def addHydro(self):
-        print("Adding Hydrogene ...")
         self.first.addHydro()
-        print(self.first)
 
     @pyqtSlot()
     def removeHydro(self):
         self.first.removeHydro()
-
-    def fromMolecule(self, molecule):
-        self.clear()
-        self.first = AtomeItem(self.first.ATOME_TYPE[molecule[0].nom], self, atome_object=molecule[0])
-        self.first.createEditor()
-        self.first.fromMolecule()
 
 
 class AtomeItem(QTreeWidgetItem):
@@ -311,29 +296,25 @@ class AtomeItem(QTreeWidgetItem):
         "N": AZOTE,
     }
     LIAISON_TYPE = {
-        "Simple": 1,
-        "Double": 2,
+        "Simple": 0,
+        "Double": 1,
     }
 
-    def __init__(self, atome, molecule, liaison=None, num=None, base=None, atome_object=None):
+    def __init__(self, atome, molecule, liaison=None, num=None, base=None):
         super().__init__()
-        if atome_object:
-            self.atome = atome_object
-            self.atome.gui_visited = True
-        else:
-            self.atome = atome()
+        self.atome = atome()
         self.childs = []
         self.setText(0, self.atome.nom)
         self.molecule = molecule
 
         self.nb_hydro = 0
 
-        if liaison == self.LIAISON_TYPE["Simple"]:
+        if liaison == 0:
             self.setIcon(0, QIcon(QPixmap("simple.png")))
-            self.liaison_type = self.LIAISON_TYPE["Simple"]
-        elif liaison == self.LIAISON_TYPE["Double"]:
+            self.liaison_type = 0
+        elif liaison == 1:
             self.setIcon(0, QIcon(QPixmap("double.png")))
-            self.liaison_type = self.LIAISON_TYPE["Double"]
+            self.liaison_type = 1
         else:
             molecule.addTopLevelItem(self)
             self.liaison_type = -1
@@ -361,21 +342,6 @@ class AtomeItem(QTreeWidgetItem):
 
         QObject.connect(self.btn, SIGNAL('clicked()'), self.createChild)
         QObject.connect(self.delete, SIGNAL('clicked()'), self.deleteAtome)
-
-    def __str__(self):
-        r = self.atome.nom + "\n"
-        for i in self.childs:
-            f = True 
-            for j in str(i).split("\n"):
-                if j is '':
-                    pass
-                elif f:
-                    r += " ∟ " + j + "\n"
-                    f = False
-                else :
-                    r += "   " + j + "\n"
-
-        return r
 
     @pyqtSlot()
     def createChild(self):
@@ -443,9 +409,9 @@ class AtomeItem(QTreeWidgetItem):
         if self.liaison_type == -1:
             return
         self.liaison_type = self.LIAISON_TYPE[liaison]
-        if self.liaison_type == self.LIAISON_TYPE["Simple"]:
+        if self.liaison_type == 0:
             self.setIcon(0, QIcon(QPixmap("simple.png")))
-        elif self.liaison_type == self.LIAISON_TYPE["Double"]:
+        elif self.liaison_type == 1:
             self.setIcon(0, QIcon(QPixmap("double.png")))
 
     def getDrawCode(self):
@@ -479,7 +445,8 @@ class AtomeItem(QTreeWidgetItem):
                 r.append(self.atome.nom)
         for i in self.childs:
             r += i.getDrawCode()
-        r.append(DRAW_LANGUAGE["finbranche"])
+        if self.liaison_type is not -1:
+            r.append(DRAW_LANGUAGE["finbranche"])
         return r
 
     def addHydro(self):
@@ -497,7 +464,7 @@ class AtomeItem(QTreeWidgetItem):
             borne = self.atome.nb_liaison - nb_childs
         elif self.liaison_type is self.LIAISON_TYPE["Simple"] and (nb_childs + 1) < self.atome.nb_liaison:
             borne = self.atome.nb_liaison - (nb_childs + 1)
-        elif self.liaison_type is self.LIAISON_TYPE["Double"] and (nb_childs + 2) < self.atome.nb_liaison:
+        elif self.liaison_type is self.LIAISON_TYPE["Simple"] and (nb_childs + 2) < self.atome.nb_liaison:
             borne = self.atome.nb_liaison - (nb_childs + 2)
 
         self.nb_hydro += borne
@@ -516,15 +483,6 @@ class AtomeItem(QTreeWidgetItem):
                 self.childs[i].deleteAtome()
             else:
                 i += 1
-
-    def fromMolecule(self):
-        print(self.atome.liaisons)
-        for i in self.atome.get_link():
-            if not i[0].gui_visited:
-                nouveau = AtomeItem(self.ATOME_TYPE[i[0].nom], self.molecule, i[1], len(self.childs), self, atome_object=i[0])
-                self.addChild(nouveau)
-                nouveau.createEditor()
-                nouveau.fromMolecule()
 
 
 class TextInput(QWidget):
@@ -546,6 +504,9 @@ class TextInput(QWidget):
     def setText(self, s):
         self.input.setText(s)
 
+    def getText(self):
+        return self.input.text()
+
 class Help(QDialog):
     def __init__(self, parent=None):
         super().__init__(parent)
@@ -564,24 +525,29 @@ class Fenetre(QDialog):
 
     def __init__(self, parent=None):
         super().__init__(parent)
-        self.layout = QVBoxLayout(self)
+        self.in_layout = QVBoxLayout()
+        self.layout = QHBoxLayout(self)
         self.help_btn = QPushButton("Aide")
         self.help_window = Help(self)
         self.layout_text = QFormLayout(self)
+        self.molecule_choice = QListWidget(self)
 
         self.input_brute = TextInput(self)
         self.input_nomenc = TextInput(self)
 
         self.draw = Drawer(self)
 
-        self.layout.addWidget(self.help_btn)
-        self.layout.addWidget(self.draw)
+        self.in_layout.addWidget(self.help_btn)
+        self.in_layout.addWidget(self.draw)
 
         self.layout_text.addRow('Formule brute :', self.input_brute)
         self.layout_text.addRow('Formule nomenclature :', self.input_nomenc)
-        self.input_nomenc.setText("méthanamide")
 
-        self.layout.addLayout(self.layout_text)
+        self.in_layout.addLayout(self.layout_text)
+
+        self.layout.addWidget(self.molecule_choice)
+        self.layout.addLayout(self.in_layout)
+
         self.setLayout(self.layout)
 
         self.setWindowTitle("Nomenclature")
@@ -590,22 +556,9 @@ class Fenetre(QDialog):
 
         QObject.connect(self.draw, SIGNAL('ready()'), self.fromGraph)
         QObject.connect(self.help_btn, SIGNAL('clicked()'), self.help_window.show)
-
-
-        c = CARBONE()
-        c1 = CARBONE()
-        c2 = CARBONE()
-        c3 = CARBONE()
-        o = OXYGENE()
-        c.link(c1)
-        c1.link(c2)
-        c2.link(c3)
-        c3.link(o, 2)
-
-        m = Molecule()
-        m.add_atome([c, c1, c2, c3, o])
-
-        self.draw.fromMolecule(m)
+        QObject.connect(self.input_nomenc, SIGNAL('ready()'), self.fromName)
+        QObject.connect(self.input_brute, SIGNAL('ready()'), self.setChoices)
+        QObject.connect(self.molecule_choice, SIGNAL('currentItemChanged(current, previous)'), self.changeMolecule)
 
     @pyqtSlot()
     def fromGraph(self):
@@ -614,6 +567,18 @@ class Fenetre(QDialog):
             self.input_brute.setText(versFormuleBrute(m))
         except OverLinked as e:
             QMessageBox.critical(self, "Erreur", str(e))
+    @pyqtSlot()
+    def fromName(self):
+        m = nomenclature(self.input_nomenc.getText())
+        #self.draw.fromMolecule(m)
+        self.input_brute.setText(versFormuleBrute(m))
+    @pyqtSlot()
+    def changeMolecule(self, current, previous):
+        self.input_nomenc.setText(current.text())
+        #self.draw.fromMolecule(m)
+    @pyqtSlot()
+    def setChoices(self):
+        m = self.input_brute.getText()
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)
