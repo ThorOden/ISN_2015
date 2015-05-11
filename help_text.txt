@@ -1,6 +1,6 @@
 <h1 id="nomenclature">Nomenclature</h1>
 
-<p>Nomenclature est un programme ayant pour but dâ€™effectuer la conversion entre les formules brutes - topologiques et nomenclaturÃ©e dâ€™une molÃ©cule de chimie organique. </p>
+<p>Nomenclature est un programme ayant pour but d'effectuer la conversion entre les formules brutes - topologiques et nomenclaturée d’une molécule de chimie organique. </p>
 
 <p><div class="toc">
 <ul>
@@ -9,7 +9,7 @@
 <li><a href="#utilisation">Utilisation</a><ul>
 <li><a href="#formule-topologique">Formule topologique</a></li>
 <li><a href="#formule-brute">Formule brute</a></li>
-<li><a href="#formule-nomenclaturÃ©e">Formule nomenclaturÃ©e</a></li>
+<li><a href="#formule-nomenclaturee">Formule nomenclaturée</a></li>
 </ul>
 </li>
 </ul>
@@ -45,28 +45,28 @@ along with this program.  If not, see <a href="http://www.gnu.org/licenses/">htt
 
 <h3 id="formule-topologique">Formule topologique</h3>
 
-<p>La saisie de la formule topologique sâ€™effectue au moyen dâ€™un affichage en arbre. Un alinÃ©a symbolise une â€œfiliationâ€, câ€™est Ã  dire une liaison.</p>
+<p>La saisie de la formule topologique s’effectue au moyen d’un affichage en arbre. Un alinéa symbolise une “filiation”, c’est à dire une liaison.</p>
 
-<p>Chaque atome possÃ¨de une barre dâ€™outils de la sorte :</p>
+<p>Chaque atome possède une barre d’outils de la sorte :</p>
 
-<p>[Suppression de lâ€™atome] [Type de liaison Ã  crÃ©er] [Nature de lâ€™atome Ã  crÃ©er] [Lancement de la crÃ©ation de lâ€™atome enfant]</p>
+<p>[Suppression de l’atome] [Type de liaison à créer] [Nature de l’atome à créer] [Lancement de la création de l’atome enfant]</p>
 
-<p>Il nâ€™est pas utile dâ€™ajouter manuellement les hydrogÃ¨nes car le programme comblera automatiquement les â€œtrousâ€ par des hydrogÃ¨ne.</p>
+<p>Il n’est pas utile d’ajouter manuellement les hydrogènes car le programme comblera automatiquement les “trous” par des hydrogène.</p>
 
-<p>Il y a Ã  disposition une barre dâ€™outils sur la droite permettant dâ€™ajouter automatiquement des hydrogÃ¨nes, dâ€™enlever automatiquement les hydrogÃ¨nes, dâ€™effacer la molÃ©cule courrante, dâ€™exporter la formule topologique courrante (nÃ©cessite dâ€™avoir lancÃ© la convertion au prÃ©alable) et de convertir lâ€™arbre vers la formule topologique, brute et nomenclaturÃ©e.</p>
+<p>Il y a à disposition une barre d’outils sur la droite permettant d’ajouter automatiquement des hydrogènes, d’enlever automatiquement les hydrogènes, d’effacer la molécule courrante, d’exporter la formule topologique courrante (nécessite d’avoir lancé la convertion au préalable) et de convertir l’arbre vers la formule topologique, brute et nomenclaturée.</p>
 
-<p><strong>Note Ã  propos de la suppression dâ€™un atome dans une molÃ©cule :</strong> la suppression dâ€™un atome entraÃ®ne la suppression de la totalitÃ© de ses enfants, sans retour en arriÃ¨re possible.</p>
+<p><strong>Note à propos de la suppression d’un atome dans une molécule :</strong> la suppression d’un atome entraîne la suppression de la totalité de ses enfants, sans retour en arrière possible.</p>
 
-<p>Il est possible de modifier un atome crÃ©Ã© prÃ©cÃ©demment au moyen dâ€™un clique droit sur ce dernier.</p>
+<p>Il est possible de modifier un atome créé précédemment au moyen d’un clique droit sur ce dernier.</p>
 
 
 
 <h3 id="formule-brute">Formule brute</h3>
 
-<p><em>Ã€ venir</em></p>
+<p><em>À venir</em></p>
 
 
 
-<h3 id="formule-nomenclaturÃ©e">Formule nomenclaturÃ©e</h3>
+<h3 id="formule-nomenclaturee">Formule nomenclaturée</h3>
 
-<p><em>Ã€ venir</em></p>
+<p><em>À venir</em></p>
