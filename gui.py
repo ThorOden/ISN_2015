@@ -21,6 +21,8 @@ import sys
 
 from versBrute import *
 
+from BruteVersClass import *
+
 from nomenclature import nomenclature
 
 from molecule import *
@@ -117,6 +119,7 @@ class Drawer(QWidget):
                 self, "Information", "Formule sauvegardée dans {}".format(fichier))
     @pyqtSlot()
     def fromMolecule(self, molecule):
+        print(molecule)
         self.editor.fromMolecule(molecule)
         self.draw_zone.reset()
         self.draw_zone.draw(self.editor.getDrawCode())
@@ -603,7 +606,7 @@ class Fenetre(QDialog):
         QObject.connect(self.draw, SIGNAL('ready()'), self.fromGraph)
         QObject.connect(self.help_btn, SIGNAL('clicked()'), self.help_window.show)
         QObject.connect(self.input_nomenc, SIGNAL('ready()'), self.fromName)
-        QObject.connect(self.input_brute, SIGNAL('ready()'), self.setChoices)
+        QObject.connect(self.input_brute, SIGNAL('ready()'), self.fromBrute)
         #QObject.connect(self.molecule_choice, SIGNAL('currentItemChanged(QListWidgetItem * current, QListWidgetItem * previous)'), self.changeMolecule)
 
     @pyqtSlot()
@@ -623,8 +626,13 @@ class Fenetre(QDialog):
         self.input_nomenc.setText(current.text())
         self.draw.fromMolecule(m)
     @pyqtSlot()
-    def setChoices(self):
-        m = self.input_brute.getText()
+    def fromBrute(self):
+        try:
+            m = bruteVersClass(self.input_brute.getText())
+            self.input_nomenc.setText("")
+            self.draw.fromMolecule(m)
+        except ImpossibleCombinaison:
+            QMessageBox.critical(self, "Erreur", "Combinaison impossible : {}".format(self.input_brute.getText()))
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)
