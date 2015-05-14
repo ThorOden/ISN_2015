@@ -387,9 +387,9 @@ class AtomeItem(QTreeWidgetItem):
             i.deleteAtome()
         if not self.base is None:
             self.base.deleteChild(self.num)
-            self.base.removeChild(self)
 
     def deleteChild(self, num):
+        # self.removeChild(self.childs[num])
         if self.childs[num].atome.nom is "H":
             self.nb_hydro -= 1
         self.childs.pop(num)
