@@ -72,7 +72,8 @@ def nomenclature(nomentre):
     decabranchecarb = 0
     longlisbr = 0
     longnomin = 0
-
+    decanbrbra = 0
+    
     hydro = 0
     carb = 0
 
@@ -100,7 +101,7 @@ def nomenclature(nomentre):
                     positionbranche.append(int(nomentre[i - positionasign]))
                     positionasign += 1
                     position += 1
-                positionasign = 0
+                positionasign = 1
 
 
 
@@ -108,7 +109,9 @@ def nomenclature(nomentre):
 
 
     for n in range(nbbranche):
-        carb, hydro = carb + sourcechaine[listbranche[n]][0] , hydro + sourcechaine[listbranche[n]][1] - nbbranche
+        carb, hydro = carb + sourcechaine[listbranche[n]][0] , hydro + sourcechaine[listbranche[n]][1]
+
+    hydro -= nbbranche
 
     if (fonction != ""):
         hydro -= sourcechaine[fonction][3]
@@ -154,7 +157,7 @@ def nomenclature(nomentre):
     for n in range(nbgroupe):       #Ajout des branches
         ChAtome[positionbranche[n] - 1].link(ChAtome[carbChaineg + n + decabranchecarb])
         for i in range(sourcechaine[listbranche[n]][4]):
-            ChAtome[carbChaineg + decachaine + decabranchecarb - n].link(ChAtome[carbChaineg + decachaine + decabranchecarb + 1 - n])
+            ChAtome[carbChaineg + decachaine + decabranchecarb - n + decanbrbra].link(ChAtome[carbChaineg + decachaine + decabranchecarb + 1 - n])
             decabranchecarb += 1
 
         for i in range(sourcechaine[listbranche[n]][3] - sourcechaine[listbranche[n]][4]): #Création de la chaine avec ajour des carbones
@@ -165,6 +168,8 @@ def nomenclature(nomentre):
             ChAtome[carbChaineg + decachaine].link(ChAtome[carb + decacarbo + decahydro])
             decahydro += 1
         decachaine += 1
+        if (nbbranche > 1):
+            decanbrbra = 2
 
 
     if fonction == "ol":

@@ -69,4 +69,16 @@ along with this program.  If not, see <a href="http://www.gnu.org/licenses/">htt
 
 <h3 id="formule-nomenclaturee">Formule nomenclaturée</h3>
 
+<p>La saisie du nom de la formule doit s'efectuer en métant un "-" entre chaque partie du nom.</p>
+
+<p>C'est à dire entre les numéros qui définissent les postion des diférents élément, puis entre les fonction, chainprincipale ou branche. Puis la position de la fonction doit aussi être noté 1 quand elle est à ctte postion là</p>
+
+<p>Quelques exemple de nom:</p>
+
+<p>2-4-diethyl-pentan</p>
+
+<p>1-2-4-trimethyl-octan-3-amine</p>
+
+<p>1-methyl-5-ethyl-pentan-1-ol</p>
+
 <p><em>À venir</em></p>
