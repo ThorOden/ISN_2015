@@ -43,4 +43,9 @@ Il est possible de modifier un atome créé précédemment au moyen d'un clique 
 *À venir*
 
 ### Formule nomenclaturée
-*À venir*
+La saisie du nom de la formule doit s'effectuer en mettant un "-" entre chaque partie du nom, c'est à dire entre les numéros qui définissent les positions des diférents éléments, puis entre les fonctions, chaîne principale ou branches. La position de la fonction doit également être noté 1 le cas échéant.
+
+Quelques exemples de noms:
+- 2-4-diethyl-pentan
+- 1-2-4-trimethyl-octan-3-amine
+- 1-methyl-5-ethyl-pentan-1-ol
