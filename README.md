@@ -40,7 +40,10 @@ Il y a à disposition une barre d'outils sur la droite permettant d'ajouter auto
 Il est possible de modifier un atome créé précédemment au moyen d'un clique droit sur ce dernier.
 
 ### Formule brute
-*À venir*
+La Formule brute est automatiquement affichée quand l'utilisateur rentre un des deux autres formes, il n'y aucune conditions spéciales dans ce sens.
+Dans le cas où l'utilisateur rentre la fomule brute, il y a deux "spécialitées" à mentionner :
+  - La formule brute peux être rentrée en minuscule ou majuscule et avec des espaces entre les différents "groupes" mais le nombre d'atomes doit être *IMPERATIVEMENT* colé à la lettre définissant l'atome. Ex : C4 h10 et non pas : c 4H 10
+  - Le programme renvoie une possibiltée à l'utilisateur mais il est cappable de toute les trouver (*Hormis les cycles*) donc il possible d'avoir deux fois la même représentation.
 
 ### Formule nomenclaturée
 La saisie du nom de la formule doit s'effectuer en mettant un "-" entre chaque partie du nom, c'est à dire entre les numéros qui définissent les positions des diférents éléments, puis entre les fonctions, chaîne principale ou branches. La position de la fonction doit également être noté 1 le cas échéant.
