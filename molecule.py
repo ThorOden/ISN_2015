@@ -42,7 +42,7 @@ class Atome:
         return list(self.liaisons)
 
     def __str__(self):
-        return self.nom + ', liÃ© ' + str(len(self.liaisons))
+        return self.nom + ', lié ' + str(len(self.liaisons))
 
     def get_nom_gui(self):
         if self.display_name_gui:
