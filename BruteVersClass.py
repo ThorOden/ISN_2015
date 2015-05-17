@@ -102,7 +102,7 @@ def bruteVersClass(molecule):
             Nombre_de_double_Liaisons=(iteration[C]*2+2)-iteration[H]
             pass
 
-    elif iteration[N]==0 and iteration[0]!=0 and iteration[C]!=0 and iteration[H]!=0 :
+    elif iteration[N]==0 and iteration[O]!=0 and iteration[C]!=0 and iteration[H]!=0 :
         print("cas avec oxygene")
         #on a des carbones, des hydrogènes et des oxygènes (alcool, cétones, acides étanoïque, ester ...)
         if iteration[H]==iteration[C]*2+2:
