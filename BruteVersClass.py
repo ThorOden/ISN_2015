@@ -10,6 +10,9 @@ class ImpossibleCombinaison(Exception):
     pass
 
 def bruteVersClass(molecule):
+    """Fonction qui passe de la formule brute (C4 H14 O2) vers la forme "numérisée" de la la classe Molecule
+    une chaine de  caractère est demandée
+    """
     # molecule = str(input("entrez votre molécule sous la forme : C6HO4"))
     if molecule[-1].isalpha()==True:
         molecule=molecule +"1"
@@ -28,13 +31,13 @@ def bruteVersClass(molecule):
             atome.append(molecule[i].upper())
             iteration.append(int(molecule[i+1]))
             i+=2
-    
+
         else:
             atome.append(molecule[i].upper())
             iteration.append(1)
             i+=1
     iteration.append(0) #c'est pour pouvoir gérer les atomes abscent
-    
+
     #définition de tout les atomes présents :
     liste_Carbones=[]
     liste_Hydrogenes=[]
@@ -57,29 +60,35 @@ def bruteVersClass(molecule):
         N=atome.index("N")
     except ValueError:
         N=-1
-    
-    print(molecule)
-    print("Nombre de carbones ={}".format(iteration[C]))
-    print("Nombre de Hydrogène ={}".format(iteration[H]))
-    print("Nombre de d'Azotes ={}".format(iteration[N]))
-    print("Nombre de d'Oxygène ={}".format(iteration[O]))
-    
-    
+
+    # print(molecule)
+    # print("Nombre de carbones ={}".format(iteration[C]))
+    # print("Nombre de Hydrogène ={}".format(iteration[H]))
+    # print("Nombre de d'Azotes ={}".format(iteration[N]))
+    # print("Nombre de d'Oxygène ={}".format(iteration[O]))
+
+
     #début de la recherche des possiblitées
-    
-    
-    
-    if iteration[N]==0 and iteration[O]==0 and iteration[C]!=0 and iteration[H]!=0:
+
+    MoleculePossible_sansH_= Molecule()
+    if iteration[C]==1 and iteration[H]==4:
+        MoleculePossible_sansH_.add_atome(CARBONE())
+        MoleculePossible_sansH_.add_atome(HYDROGENE())
+        for n in range(3):
+                MoleculePossible_sansH_[0].link(MoleculePossible_sansH_[-1])
+                MoleculePossible_sansH_.add_atome(HYDROGENE())
+        return MoleculePossible_sansH_
+    elif iteration[N]==0 and iteration[O]==0 and iteration[C]!=0 and iteration[H]!=0:
         #on a que des carbones et hydrogènes (alcane ou alcène)
         if iteration[C]*2+2==iteration[H] :
             #cas le plus simple pas de double liaison
-            print("cas simple")
+            # print("cas simple")
             MoleculePossible_sansH_= UneChaineCarbonnee(iteration[C])
         elif iteration[C]*2+2<iteration[H] :
             raise ImpossibleCombinaison()
             exit
         else:
-            print("cas avec des doubles liasons")
+            # print("cas avec des doubles liasons")
             Nombre_de_double_Liaisons=(iteration[C]*2+2)-iteration[H]
             pass
     elif iteration[N]==0 and iteration[0]!=0 and iteration[C]!=0 and iteration[H]!=0 :
@@ -90,29 +99,28 @@ def bruteVersClass(molecule):
         elif iteration[C]*2+2<iteration[H] :
             raise ImpossibleCombinaison()
             exit
-    
-    
+
+
     #ajout des Hydrogenes
     MoleculePossible_sansH_.add_atome(HYDROGENE())
     for numeroAtome in range(iteration[C]+iteration[N]+iteration[O]):
         try :
             for n in range(4):
-                print("avant ereur : ",len(MoleculePossible_sansH_))
+                # print("avant ereur : ",len(MoleculePossible_sansH_))
                 MoleculePossible_sansH_[numeroAtome].link(MoleculePossible_sansH_[-1])
                 MoleculePossible_sansH_.add_atome(HYDROGENE())
-    
+
         except OverLinked:
-    
-            print("numero de l'atome : ",numeroAtome+1)
-            print("il y a ",n,"Hydorgene rajoute")
-    
+            pass
+            # print("numero de l'atome : ",numeroAtome+1)
+            # print("il y a ",n,"Hydorgene rajoute")
+
     del MoleculePossible_sansH_[-1]
     MoleculePossiblecomplete=MoleculePossible_sansH_
-    
+
     return MoleculePossiblecomplete
-    
+
     #formuleBrute=versFormuleBrute(MoleculePossiblecomplete)
-    #print(formuleBrute)
+    print(formuleBrute)
 
-
-
+bruteVersClass("ch4")
