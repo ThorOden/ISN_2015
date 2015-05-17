@@ -1,4 +1,4 @@
-﻿# Créé par BOUVIN valentin, le 02/02/2015 en Python 3.2
+# Créé par BOUVIN valentin, le 02/02/2015 en Python 3.2
 from molecule import *
 from calcul import *
 #from versBrute import *
@@ -7,6 +7,8 @@ from calcul import *
 #Par contre ca ne marche pas si tu la rentre sous cette forme : Ch4OO C4H12     avec deux fois des C ou des H
 
 class ImpossibleCombinaison(Exception):
+    pass
+class HydrogeneProblem(Exception):
     pass
 
 def bruteVersClass(molecule):
@@ -61,66 +63,87 @@ def bruteVersClass(molecule):
     except ValueError:
         N=-1
 
-    # print(molecule)
-    # print("Nombre de carbones ={}".format(iteration[C]))
-    # print("Nombre de Hydrogène ={}".format(iteration[H]))
-    # print("Nombre de d'Azotes ={}".format(iteration[N]))
-    # print("Nombre de d'Oxygène ={}".format(iteration[O]))
+    print(molecule)
+    print("Nombre de carbones ={}".format(iteration[C]))
+    print("Nombre de Hydrogène ={}".format(iteration[H]))
+    print("Nombre de d'Azotes ={}".format(iteration[N]))
+    print("Nombre de d'Oxygène ={}".format(iteration[O]))
 
 
     #début de la recherche des possiblitées
 
     MoleculePossible_sansH_= Molecule()
-    if iteration[C]==1 and iteration[H]==4:
+
+    if iteration[H]%2==1:
+        raise ImpossibleCombinaison()
+        exit
+
+    elif iteration[C]==1 and iteration[H]==4:
+        #traitement du cas particulier de CH4
         MoleculePossible_sansH_.add_atome(CARBONE())
         MoleculePossible_sansH_.add_atome(HYDROGENE())
         for n in range(3):
                 MoleculePossible_sansH_[0].link(MoleculePossible_sansH_[-1])
                 MoleculePossible_sansH_.add_atome(HYDROGENE())
         return MoleculePossible_sansH_
+
     elif iteration[N]==0 and iteration[O]==0 and iteration[C]!=0 and iteration[H]!=0:
         #on a que des carbones et hydrogènes (alcane ou alcène)
+        print ("cas avec que carbones")
         if iteration[C]*2+2==iteration[H] :
             #cas le plus simple pas de double liaison
-            # print("cas simple")
+            print("cas simple")
             MoleculePossible_sansH_= UneChaineCarbonnee(iteration[C])
         elif iteration[C]*2+2<iteration[H] :
             raise ImpossibleCombinaison()
             exit
         else:
-            # print("cas avec des doubles liasons")
+            print("cas avec des doubles liasons")
             Nombre_de_double_Liaisons=(iteration[C]*2+2)-iteration[H]
             pass
+
     elif iteration[N]==0 and iteration[0]!=0 and iteration[C]!=0 and iteration[H]!=0 :
+        print("cas avec oxygene")
         #on a des carbones, des hydrogènes et des oxygènes (alcool, cétones, acides étanoïque, ester ...)
         if iteration[H]==iteration[C]*2+2:
             #cas le plus simple pas de double liaison
-            pass
+            print("cas simple")
+            MoleculePossible_sansH_=UneChaineOxygenee(iteration[C],iteration[O])
         elif iteration[C]*2+2<iteration[H] :
             raise ImpossibleCombinaison()
             exit
+        else:
+            print("cas avec des doubles liasons")
+            Nombre_de_double_Liaisons=(iteration[C]*2+2)-iteration[H]
+            pass
 
 
     #ajout des Hydrogenes
+    nbHydrogene_cree=0
     MoleculePossible_sansH_.add_atome(HYDROGENE())
     for numeroAtome in range(iteration[C]+iteration[N]+iteration[O]):
         try :
             for n in range(4):
-                # print("avant ereur : ",len(MoleculePossible_sansH_))
+                #print("avant ereur : ",len(MoleculePossible_sansH_))
                 MoleculePossible_sansH_[numeroAtome].link(MoleculePossible_sansH_[-1])
                 MoleculePossible_sansH_.add_atome(HYDROGENE())
-
+                nbHydrogene_cree+=1
         except OverLinked:
+
+            #print("numero de l'atome : ",numeroAtome+1)
+            #print("il y a ",n,"Hydorgene rajoute")
             pass
-            # print("numero de l'atome : ",numeroAtome+1)
-            # print("il y a ",n,"Hydorgene rajoute")
 
     del MoleculePossible_sansH_[-1]
     MoleculePossiblecomplete=MoleculePossible_sansH_
 
+    if iteration[H]!=nbHydrogene_cree:
+        raise HydrogeneProblem()
+
     return MoleculePossiblecomplete
 
     #formuleBrute=versFormuleBrute(MoleculePossiblecomplete)
-    print(formuleBrute)
+    #print(formuleBrute)
 
-bruteVersClass("ch4")
+#print(versFormuleBrute(bruteVersClass("c4o3h10")))
+
