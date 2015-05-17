@@ -422,22 +422,19 @@ class AtomeItem(QTreeWidgetItem):
         if len(self.childs) == 0:
             return [self.atome]
         else:
-            try:
-                voisins = []
-                for i in self.childs:
-                    a = i.getAndLinkAtome()
-                    voisins = a + voisins
-                    try:
-                        self.atome.link(voisins[0])
-                    except OverLinked as e:
-                        self.atome.delink()
-                        QMessageBox.critical(self.molecule, "Erreur", str(e))
-                        self.molecule.setCurrentItem(i)
-
-                    if i.liaison_type is self.LIAISON_TYPE["Double"]:
-                        self.atome.link(voisins[0])
-            except OverLinked as e:
-                pass
+            voisins = []
+            for i in self.childs:
+                a = i.getAndLinkAtome()
+                voisins = a + voisins
+                n = 1
+                if i.liaison_type is self.LIAISON_TYPE["Double"]:
+                    n=2
+                try:
+                    self.atome.link(voisins[0], n=n)
+                except OverLinked as e:
+                    self.atome.delink()
+                    QMessageBox.critical(self.molecule, "Erreur", str(e))
+                    self.molecule.setCurrentItem(i)
             return [self.atome] + voisins
 
     def changeName(self, name):
@@ -474,10 +471,7 @@ class AtomeItem(QTreeWidgetItem):
         if self.atome.nom is "C":
             r.append(DRAW_LANGUAGE[self.atome.nom])
         elif self.atome.nom in ["O", "N"]:
-            nb_h = 0
-            for i in self.childs:
-                if i.atome.nom is "H":
-                    nb_h += 1
+            nb_h = self.nb_hydro
             if nb_h > 1:
                 r.append(self.atome.nom + "H" + str(nb_h))
             elif nb_h == 1:
@@ -506,8 +500,7 @@ class AtomeItem(QTreeWidgetItem):
             borne = self.atome.nb_liaison - (nb_childs + 1)
         elif self.liaison_type is self.LIAISON_TYPE["Double"] and (nb_childs + 2) < self.atome.nb_liaison:
             borne = self.atome.nb_liaison - (nb_childs + 2)
-
-        self.nb_hydro += borne
+            
         for i in range(borne):
             nouveau = AtomeItem(self.ATOME_TYPE["H"], self.molecule, self.LIAISON_TYPE[
                 "Simple"], len(self.childs), self)
