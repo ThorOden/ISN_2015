@@ -212,7 +212,7 @@ class DrawZone(QGraphicsView):
     def draw_line(self, line):
         pos = self.pos_stor.look()
         deplacement = (
-            cos(self.current_angle) * 70, sin(self.current_angle) * 70)
+            cos(self.current_angle) * 30, sin(self.current_angle) * 30)
         new_pos = (pos[0] + deplacement[0], pos[1] + deplacement[1])
 
         self.scene.addLine(pos[0], pos[1], new_pos[0], new_pos[1])
@@ -235,7 +235,14 @@ class DrawZone(QGraphicsView):
         self.fact = 1
 
     def save(self, fichier):
-        QPixmap.grabWidget(self).save(fichier)
+        self.scene.clearSelection()
+        self.scene.setSceneRect(self.scene.itemsBoundingRect())
+        image = QImage(self.scene.sceneRect().size().toSize(), QImage.Format_ARGB32)
+        image.fill(Qt.transparent)
+        painter = QPainter(image)
+        self.scene.render(painter)
+        image.save(fichier)
+        del painter
 
 
 class MoleculeEdit(QTreeWidget):
