@@ -119,7 +119,7 @@ class Drawer(QWidget):
                 self, "Information", "Formule sauvegardée dans {}".format(fichier))
     @pyqtSlot()
     def fromMolecule(self, molecule):
-        print(molecule)
+        # print(molecule)
         self.editor.fromMolecule(molecule)
         self.draw_zone.reset()
         self.draw_zone.draw(self.editor.getDrawCode())
